@@ -5,7 +5,7 @@ import os, sys, time
 import sc2reader
 
 base_path = "/Users/luozijun/Library/Application Support/Blizzard/StarCraft II/Accounts"
-path = os.path.join(base_path, "") # 自定义 目录
+path = os.path.join(base_path, "187958739/5-S2-1-1351153/Replays/Multiplayer")
 
 def number_to_binary(n, b):
     s = []
@@ -17,7 +17,16 @@ def number_to_binary(n, b):
     s.reverse()
     return "".join(s)
 
-# replay = sc2reader.load_replay('MyReplay', load_map=true)
+def binary_to_number(s):
+    if s.startswith("0b"): s = s[2:]
+    s = list(s)
+    s.reverse()
+    s = map(lambda n: int(n), s)
+    return sum(map(lambda (a, b): a*b, zip(s, map(lambda n: 2**n, range(len(s)))) ))
+
+# binary_to_number(bin(52))
+# binary_to_number(number_to_binary(52, 2))
+
 replays = sc2reader.load_replays(path)
 
 for replay in replays:
@@ -55,7 +64,7 @@ for replay in replays:
                 state = "LOSS"
             else:
                 state = "UNKNOW"
-            print("\t\t %s - %s - %d (%s) " %(player.detail_data['name'], player.detail_data['race'], player.detail_data['bnet']['uid'], state)  )
+            print("\t\t %s - %s - %d (%s) " %(player.detail_data['name'], player.detail_data['race'], player.toon_id, state)  )
 
 
     print("\tWinner: ", replay.winner)

@@ -17,8 +17,15 @@ function number_to_binary(n, b){
 
 contract BytesReader {
     
-    function byte_to_bits(byte b) returns (uint1 [] ) {
-        
+    function byte_to_bits(uint n) returns (uint [] ) {
+        uint b = 2;
+        uint [] s;
+        while ( n !== 0 ) {
+            uint m = n % b;
+            n = n/b;
+            s.push(m);
+        }
+        return s;
     }
     function BytesReader (){
 

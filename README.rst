@@ -13,6 +13,66 @@
 
 该合约可以对 `星际争霸2` 这款游戏的比赛结果进行分析，并给出胜负结果。
 
+开发
+------
+
+*相关依赖*:
+
+.. code:: bash
+	
+	pip install eth-testrpc
+	brew install parity solidity geth # macOS
+	npm install -g solc web3 dapple
+	npm install -g webpack
+	# 克隆代码
+	git clone https://github.com/LuoZijun/solidity-sc2-replay-reader
+	cd solidity-sc2-replay-reader
+	npm install -d
+
+
+安装完上述工具包，你的系统应该就有以下命令可以使用:
+
+*	testrpc
+*	parity
+*	solc
+*	geth
+*	solcjs
+*	dapple
+*	webpack
+
+
+简单介绍下这几个命令的作用:
+
+`parity` (基于 Rust 语言) 和 `geth` (基于 Golang 语言) 是以太坊的客户端，你可以按照喜好选择安装一个(推荐 `parity` )。
+
+
+`testrpc` 是一个 `Python` 写的 以太坊 `JsonRPC Service` 模拟器，可以用来在开发时，对代码进行测试。
+以太坊客户端 `parity` 和 `geth` 都提供了 完整的 `JsonRPC Service` 。
+
+
+`solc` 和 `solcjs` 是 以太坊 合约语言 `solidity` 的编译器，其中 `solc` 采用 `C++` 语言编写，
+`solcjs` 采用 `Emscripten <https://github.com/kripken/emscripten>`_ 这个工具 对 `C++` 代码翻译成 `JavaScript` 代码，
+所以，如果你在意性能，请直接使用 `C++` 版本的 `solidity` 编译器。
+
+
+`dapple` 是一个 `Solidity` 语言的包管理器，已经构建辅助工具，你可以不使用它。
+
+
+`webpack` 这个是 `NodeJS` 的打包工具，相信不需要多介绍了 :))
+
+
+*编译合约*:
+
+.. code:: bash
+
+	cd solidity-sc2-replay-reader/
+	# 使用构建工具来编译，或者直接使用 `solc target.solc || solcjs target.solc` 命令来编译 
+	dapple build
+	# 打包 JS 文件
+	webpack -w
+	# 打开测试文件
+	open index.html
+
 
 参考
 ------

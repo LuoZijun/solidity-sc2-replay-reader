@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.8;
 
 library Math {
     function max(uint a, uint b) returns (uint) {

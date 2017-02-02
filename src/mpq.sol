@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.8;
 
 // MPQ Archives
 // MPQ file format http://www.zezula.net/en/mpq/mpqformat.html

@@ -108,15 +108,19 @@ def restruct():
         if object_name not in data or type(data[object_name]) != dict:
             data[object_name] = {}
         if key not in data[object_name]:
-            data[object_name][key] = open(filepath, "rb").read()
+            res = open(filepath, "rb").read()
+            if key == "interface":
+                data[object_name][key] = json.loads(res)
+            else:
+                data[object_name][key] = res
         
         return data
 
     data = reduce(path_handle, abi_files, reduce(path_handle, bin_files, {}) )
 
-
     print("======================Contract=========================")
     output = json.dumps(data)
+    open(os.path.join(build_dir, "contract.json"), "wb").write(output)
     print(output)
 
 def usage():

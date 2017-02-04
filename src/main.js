@@ -5,36 +5,39 @@ const contracts = require("../build/contract.json");
 const env  = {rpcURL: "http://localhost:8545"};
 const web3 = new Web3(new Web3.providers.HttpProvider(env.rpcURL));
 
-const callback = function(e, contract){
-    if(!e) {
-      	if(!contract.address) {
-      		let message = [
-      			"Contract transaction send: TransactionHash: ",
-      			contract.transactionHash,
-      			" waiting to be mined..."
-      		].join("");
-        	console.log(message);
-      	} else {
-        	console.log("Contract mined!");
-        	console.log(contract);
-      	}
-    }
-};
-
+const Address = web3.eth.accounts[0];
 
 Object.keys(contracts).forEach(function (key, i){
-	let initializer = {
-		from: web3.eth.accounts[0],
-		data: contracts[key]["code"],
-		gas : 300000
-	};
-	
-	let contract = web3.eth.contract(contracts[key]["interface"]);
-	contract.code = contracts[key]["code"];
-	contracts[key] = contract;
-	// contract.new(initializer, callback);
+    var contract   = web3.eth.contract(contracts[key]["interface"]);
+    contract.code  = contracts[key]["code"];
+    contracts[key] = contract;
+    // contract.new(initializer, callback);
 });
 
 
-console.log(contracts);
+const helloworld = contracts.HelloWorld;
+const initializer = {
+    from: web3.eth.accounts[0],
+    data: contracts.HelloWorld["code"],
+    gas : '4000000'
+};
+
+const callback = function(e, contract){
+    if(!e) {
+        if(!contract.address) {
+            var msg = [
+                "Contract transaction send: TransactionHash: ",
+                contract.transactionHash.toString(),
+                " waiting to be mined..."
+            ].join("");
+            console.log(msg);
+        } else {
+            console.log("Contract mined!");
+            console.log(contract);
+        }
+    }
+};
+const helloworld_js = helloworld.new(initializer, callback);
+
+console.log(helloworld_js);
 

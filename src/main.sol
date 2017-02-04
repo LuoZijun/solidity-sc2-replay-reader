@@ -1,4 +1,9 @@
 pragma solidity ^0.4.8;
+
+import {Math} from './math.sol';
+import {Mpq} from './mpq.sol';
+import {Replay} from './sc2/replay.sol';
+
 /**
 
 // JavaScript Number To Bits
@@ -16,6 +21,12 @@ function number_to_binary(n, b){
 }
 **/
 
+library HelloWorld {
+    function hi() returns(string) {
+        return "Hello, 世界！";
+    }
+}
+
 contract BytesReader {
     uint[] s;
     // storage memory
@@ -29,7 +40,6 @@ contract BytesReader {
         }
         return s;
     }
-    function BytesReader (){
-        
-    }
 }
+
+

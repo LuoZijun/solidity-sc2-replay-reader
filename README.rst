@@ -20,8 +20,10 @@
 
 .. code:: bash
 	
-	brew install parity solidity geth # macOS
-	# pip install eth-testrpc
+	# brew install geth # 选择安装 geth 或 parity
+	brew install parity --master
+	brew install solidity
+
 	npm install -g ethereumjs-testrpc
 	npm install -g solc web3 dapple
 	npm install -g webpack
@@ -33,12 +35,12 @@
 
 安装完上述工具包，你的系统应该就有以下命令可以使用:
 
-*	testrpc
+
+*	geth
 *	parity
 *	solc
-*	geth
+*	testrpc
 *	solcjs
-*	dapple
 *	webpack
 
 
@@ -56,9 +58,6 @@
 所以，如果你在意性能，请直接使用 `C++` 版本的 `solidity` 编译器。
 
 
-`dapple` 是一个 `Solidity` 语言的包管理器，以及构建辅助工具，你可以不使用它。
-
-
 `webpack` 这个是 `NodeJS` 的打包工具，相信不需要多介绍了 :))
 
 
@@ -67,8 +66,9 @@
 .. code:: bash
 
 	cd solidity-sc2-replay-reader/
-	# 使用构建工具来编译，或者直接使用 `solc target.solc || solcjs target.solc` 命令来编译 
-	dapple build
+	parity --chain dev # geth --dev console
+	# 使用辅助脚本来编译，或者直接使用 `solc target.solc || solcjs target.solc` 命令来编译 
+	python solidity.py
 	# 打包 JS 文件
 	webpack -w
 	# 打开测试文件

@@ -32,11 +32,11 @@ library SC2Protocol {
 
 }
 
-library BitReader {
+// library BitReader {
 
-}
+// }
 
-library ByteReader {
+// library ByteReader {
 
-}
+// }
 

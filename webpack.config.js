@@ -21,7 +21,8 @@ module.exports = {
         loaders: [
             // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
             { test: /\.js|jsx$/, loaders: ['babel-loader'] },
-            { test: /\.json$/, loader: "json-loader" }
+            { test: /\.json$/, loader: "json-loader" },
+            
         ],
 
         preLoaders: [

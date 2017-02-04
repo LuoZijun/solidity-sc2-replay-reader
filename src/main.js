@@ -1,10 +1,10 @@
+'use strict';
 
 const Web3 = require("web3");
 const contracts = require("../build/contract.json");
 
 const env  = {rpcURL: "http://localhost:8545"};
 const web3 = new Web3(new Web3.providers.HttpProvider(env.rpcURL));
-
 
 function main(){
     Object.keys(contracts).forEach(function (key, i){
@@ -32,22 +32,45 @@ function main(){
                 console.log(msg);
             } else {
                 console.info("Deploy Success ...");
-                console.info("Contract Address: ", contract.address);
-                let result = contract.hi.call();
+                console.info("Contract Address: " + contract.address);
+                var result = contract.hi.call();
                 console.log(result);
             }
         }
     });
 }
 
-
-
 function demo_test(){
-    let tokenSource = 'pragma solidity ^0.4.6; contract Token {     address issuer;     mapping (address => uint) balances;      event Issue(address account, uint amount);     event Transfer(address from, address to, uint amount);      function Token() {         issuer = msg.sender;     }      function issue(address account, uint amount) {         if (msg.sender != issuer) throw;         balances[account] += amount;     }      function transfer(address to, uint amount) {         if (balances[msg.sender] < amount) throw;          balances[msg.sender] -= amount;         balances[to] += amount;          Transfer(msg.sender, to, amount);     }      function getBalance(address account) constant returns (uint) {         return balances[account];     } }';
-    let tokenCompiled = {Token: web3.eth.compile.solidity(tokenSource) };
+    // let tokenSource = fs.readFileSync("./token.sol", "utf-8");
+    var tokenSource = "pragma solidity ^0.4.8;"
+                    + "contract Token {"
+                    + "    address issuer;"
+                    + "    mapping (address => uint) balances;"
+                    + "    event Issue(address account, uint amount);"
+                    + "    event Transfer(address from, address to, uint amount);"
+                    + "    function Token() {"
+                    + "        issuer = msg.sender;"
+                    + "    }"
+                    + "    function issue(address account, uint amount) {"
+                    + "        if (msg.sender != issuer) throw;"
+                    + "        balances[account] += amount;"
+                    + "    }"
+                    + "    function transfer(address to, uint amount) {"
+                    + "        if (balances[msg.sender] < amount) throw;"
+                    + "        balances[msg.sender] -= amount;"
+                    + "        balances[to] += amount;"
+                    + "        Transfer(msg.sender, to, amount);"
+                    + "    }"
+                    + "    function getBalance(address account) constant returns (uint) {"
+                    + "        return balances[account];"
+                    + "    }"
+                    + "}";
 
-    let contract = web3.eth.contract(tokenCompiled.Token.info.abiDefinition);
-    let initializer = {from: web3.eth.accounts[0], data: tokenCompiled.Token.code, gas: 300000};
+    var tokenCompiled = { Token: web3.eth.compile.solidity(tokenSource) };
+
+    var contract = web3.eth.contract(tokenCompiled.Token.info.abiDefinition);
+    var initializer = {from: web3.eth.accounts[0], data: tokenCompiled.Token.code, gas: 300000};
+
     // Deploy new contract
     // contract.new(initializer, function(e, contract){
     //     if(!e) {
@@ -69,7 +92,6 @@ function demo_test(){
 
     // Instantiate by address
     var myContractInstance = contract.at("0x5637c67b02e6ece0d8ede2f5f1390c99c57b2ee7");
-
     var result = myContractInstance.getBalance(web3.eth.accounts[0]);
     console.log(result.toNumber());
 }

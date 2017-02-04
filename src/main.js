@@ -22,7 +22,7 @@ const initializer = {
     gas : '4000000'
 };
 
-const callback = function(e, contract){
+helloworld.new(initializer, function(e, contract){
     if(!e) {
         if(!contract.address) {
             var msg = [
@@ -34,10 +34,10 @@ const callback = function(e, contract){
         } else {
             console.log("Contract mined!");
             console.log(contract);
+            let result = contract.hi.call();
+            console.log(result);
         }
     }
-};
-const helloworld_js = helloworld.new(initializer, callback);
+});
 
-console.log(helloworld_js);
 

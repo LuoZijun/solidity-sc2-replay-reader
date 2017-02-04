@@ -20,8 +20,9 @@
 
 .. code:: bash
 	
-	pip install eth-testrpc
 	brew install parity solidity geth # macOS
+	# pip install eth-testrpc
+	npm install -g ethereumjs-testrpc
 	npm install -g solc web3 dapple
 	npm install -g webpack
 	# 克隆代码
@@ -46,7 +47,7 @@
 `parity` (基于 Rust 语言) 和 `geth` (基于 Golang 语言) 是以太坊的客户端，你可以按照喜好选择安装一个(推荐 `parity` )。
 
 
-`testrpc` 是一个 `Python` 写的 以太坊 `JsonRPC Service` 模拟器，可以用来在开发时，对代码进行测试。
+`testrpc` 是一个以太坊 `JsonRPC Service` 模拟器，可以用来在开发时，对代码进行测试。
 以太坊客户端 `parity` 和 `geth` 都提供了 完整的 `JsonRPC Service` 。
 
 

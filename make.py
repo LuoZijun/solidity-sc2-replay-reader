@@ -19,7 +19,6 @@ ast_dir = os.path.join(BASE_PATH, "build/ast")
 
 src_entry = os.path.join(src_dir, "main.sol")
 
-TEMPLATE = ""
 
 def rmdir(path):
     for root, dirs, files in os.walk(path, topdown=False):
@@ -62,6 +61,22 @@ def diff_path():
 def clean_dst_path():
     rmdir(dst_dir)
     os.mkdir(dst_dir)
+
+def find_compilers():
+    paths = os.environ["PATH"].split(":")
+    solc = filter(lambda p: os.path.exists(os.path.join(p, "solc")) and os.path.isfile(os.path.join(p, "solc")), paths)
+    # os.path.exists(os.path.join(p, "solcjs")) and os.path.isfile(os.path.join(p, "solcjs"))
+    serpent = filter(lambda p: os.path.exists(os.path.join(p, "serpent")) and os.path.isfile(os.path.join(p, "serpent")), paths)
+    lllc    = filter(lambda p: os.path.exists(os.path.join(p, "lllc")) and os.path.isfile(os.path.join(p, "lllc")), paths)
+
+    result = []
+    if len(solc) > 0:
+        result.append("Solidity")
+    if len(serpent) > 0:
+        result.append("Serpent")
+    if len(lllc) > 0:
+        result.append("LLL")
+    return result
 
 def complie_soldity():
     """
@@ -126,13 +141,22 @@ def restruct():
 
 def usage():
     message = """
-        $ python make.py --help
+        $ python solidity.py -src ./src -entry main.sol -out ./build -target contract.json
 
-
+            -src    solidity source dir
+            -entry  source entry file
+            -out    output dir
+            -target solidity bytecode and interface file (JSON Format)
+            --help  show this help text
     """
     print(message)
 
 def main():
+    compilers = find_compilers()
+    print("====================Compilers====================")
+    print(compilers)
+    assert("Solidity" in compilers)
+    
     clean_dst_path()
     diff_path()
     complie_soldity()

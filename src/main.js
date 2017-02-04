@@ -5,39 +5,76 @@ const contracts = require("../build/contract.json");
 const env  = {rpcURL: "http://localhost:8545"};
 const web3 = new Web3(new Web3.providers.HttpProvider(env.rpcURL));
 
-const Address = web3.eth.accounts[0];
 
-Object.keys(contracts).forEach(function (key, i){
-    var contract   = web3.eth.contract(contracts[key]["interface"]);
-    contract.code  = contracts[key]["code"];
-    contracts[key] = contract;
-    // contract.new(initializer, callback);
-});
+function main(){
+    Object.keys(contracts).forEach(function (key, i){
+        var contract   = web3.eth.contract(contracts[key]["interface"]);
+        contract.code  = contracts[key]["code"];
+        contracts[key] = contract;
+        // contract.new(initializer, callback);
+    });
 
+    const helloworld = contracts.HelloWorld;
+    const initializer = {
+        from: web3.eth.accounts[0],
+        data: contracts.HelloWorld["code"],
+        gas : '4000000'
+    };
 
-const helloworld = contracts.HelloWorld;
-const initializer = {
-    from: web3.eth.accounts[0],
-    data: contracts.HelloWorld["code"],
-    gas : '4000000'
-};
-
-helloworld.new(initializer, function(e, contract){
-    if(!e) {
-        if(!contract.address) {
-            var msg = [
-                "Contract transaction send: TransactionHash: ",
-                contract.transactionHash.toString(),
-                " waiting to be mined..."
-            ].join("");
-            console.log(msg);
-        } else {
-            console.log("Contract mined!");
-            console.log(contract);
-            let result = contract.hi.call();
-            console.log(result);
+    helloworld.new(initializer, function(e, contract){
+        if(!e) {
+            if(!contract.address) {
+                var msg = [
+                    "Contract transaction send: TransactionHash: ",
+                    contract.transactionHash.toString(),
+                    " waiting to be mined..."
+                ].join("");
+                console.log(msg);
+            } else {
+                console.info("Deploy Success ...");
+                console.info("Contract Address: ", contract.address);
+                let result = contract.hi.call();
+                console.log(result);
+            }
         }
-    }
-});
+    });
+}
+
+
+
+function demo_test(){
+    let tokenSource = 'pragma solidity ^0.4.6; contract Token {     address issuer;     mapping (address => uint) balances;      event Issue(address account, uint amount);     event Transfer(address from, address to, uint amount);      function Token() {         issuer = msg.sender;     }      function issue(address account, uint amount) {         if (msg.sender != issuer) throw;         balances[account] += amount;     }      function transfer(address to, uint amount) {         if (balances[msg.sender] < amount) throw;          balances[msg.sender] -= amount;         balances[to] += amount;          Transfer(msg.sender, to, amount);     }      function getBalance(address account) constant returns (uint) {         return balances[account];     } }';
+    let tokenCompiled = {Token: web3.eth.compile.solidity(tokenSource) };
+
+    let contract = web3.eth.contract(tokenCompiled.Token.info.abiDefinition);
+    let initializer = {from: web3.eth.accounts[0], data: tokenCompiled.Token.code, gas: 300000};
+    // Deploy new contract
+    // contract.new(initializer, function(e, contract){
+    //     if(!e) {
+    //         if(!contract.address) {
+    //             console.log("Contract transaction send: TransactionHash: " 
+    //                 + contract.transactionHash 
+    //                 + " waiting to be mined...");
+    //         } else {
+    //             // console.log("Contract mined!");
+    //             console.info("Deploy Success ...");
+    //             // 0x5637c67b02e6ece0d8ede2f5f1390c99c57b2ee7
+    //             console.info("Contract Address: ", contract.address);
+    //             // console.log(contract);
+    //             let balances = contract.getBalance.call(web3.eth.accounts[0]);
+    //             console.log("Balances: ", balances.toNumber());
+    //         }
+    //     }
+    // });
+
+    // Instantiate by address
+    var myContractInstance = contract.at("0x5637c67b02e6ece0d8ede2f5f1390c99c57b2ee7");
+
+    var result = myContractInstance.getBalance(web3.eth.accounts[0]);
+    console.log(result.toNumber());
+}
+
+main();
+demo_test();
 
 

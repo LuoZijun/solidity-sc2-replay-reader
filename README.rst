@@ -75,6 +75,68 @@
 	open index.html
 
 
+Parity Dev Chain
+-----------------------
+
+macOS 配置目录 : `/Users/your-name/Library/Application Support/io.parity.ethereum`
+
+
+.. code:: bash
+
+	parity account new 
+	# Account : 00c512b12FeD6F51F7B9B60D198dE9D5eE0aBCD9
+	echo "YourPassword.." >> pwd.txt
+
+
+chain.json :
+
+.. code:: json
+
+	{
+	    "name": "DevelopmentChain",
+	    "engine": {
+	        "instantSeal": null
+	    },
+	    "params": {
+	        "accountStartNonce": "0x0",
+	        "maximumExtraDataSize": "0x20",
+	        "minGasLimit": "0x1388",
+	        "networkID" : "0x11"
+	    },
+	    "genesis": {
+	        "seal": {
+	            "generic": "0x0"
+	        },
+	        "difficulty": "0x20000",
+	        "author": "0x0000000000000000000000000000000000000000",
+	        "timestamp": "0x00",
+	        "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	        "extraData": "0x",
+	        "gasLimit": "0x5B8D80"
+	    },
+	    "accounts": {
+	        "0000000000000000000000000000000000000001": { "balance": "1", "builtin": { "name": "ecrecover", "pricing": { "linear": { "base": 3000, "word": 0 } } } },
+	        "0000000000000000000000000000000000000002": { "balance": "1", "builtin": { "name": "sha256", "pricing": { "linear": { "base": 60, "word": 12 } } } },
+	        "0000000000000000000000000000000000000003": { "balance": "1", "builtin": { "name": "ripemd160", "pricing": { "linear": { "base": 600, "word": 120 } } } },
+	        "0000000000000000000000000000000000000004": { "balance": "1", "builtin": { "name": "identity", "pricing": { "linear": { "base": 15, "word": 3 } } } },
+	        "00c512b12FeD6F51F7B9B60D198dE9D5eE0aBCD9": { "balance": "1606938044258990275541962092341162602522202993782792835301376" }
+	    }
+	}
+
+
+启动 开发网络:
+
+.. code:: bash
+	
+	parity --chain chain.json \
+    	--author "0x00c512b12FeD6F51F7B9B60D198dE9D5eE0aBCD9" \
+    	--unlock "0x00c512b12FeD6F51F7B9B60D198dE9D5eE0aBCD9" \
+    	--password pwd.txt \
+    	--rpccorsdomain "*" \
+    	--jsonrpc-interface all --jsonrpc-hosts all \
+    	--force-ui
+
+
 参考
 ------
 

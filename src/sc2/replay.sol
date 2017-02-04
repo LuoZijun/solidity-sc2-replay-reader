@@ -2,7 +2,8 @@ pragma solidity ^0.4.8;
 
 // Starcraft 2 Replay 
 
-library Replay {
+library SC2Replay {
+	enum State { Unknow, Win, Loss }
 	struct Pixel {
 		uint8 r;
 		uint8 g;
@@ -19,7 +20,7 @@ library Replay {
 		string hero;
 		string name;
 	}
-	struct SCReplay {
+	struct Replay {
 		Player[] players;
 	}
 	function read(bytes replay_file) {
@@ -31,12 +32,4 @@ library Replay {
 library SC2Protocol {
 
 }
-
-// library BitReader {
-
-// }
-
-// library ByteReader {
-
-// }
 

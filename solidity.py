@@ -127,6 +127,9 @@ def restruct():
             if key == "interface":
                 open(os.path.join(abi_dir, object_name+".abi"), "wb").write(res)
                 data[object_name][key] = json.loads(res)
+            elif key == "code":
+                res = "0x" + res
+                data[object_name][key] = res
             else:
                 data[object_name][key] = res
         

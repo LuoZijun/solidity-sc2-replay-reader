@@ -7,6 +7,8 @@ const contracts = require("../build/contract.json");
 const env  = {rpcURL: "http://127.0.0.1:8545"};
 const web3 = new Web3(new Web3.providers.HttpProvider(env.rpcURL));
 
+window.web3 = web3;
+
 // Dev Chain: 0x00c512b12fed6f51f7b9b60d198de9d5ee0abcd9
 const account = web3.eth.accounts[0];
 
@@ -19,7 +21,7 @@ function main(){
     // });
     const helloworld = contracts.HelloWorld;
     const helloworldContract = web3.eth.contract(helloworld.interface);
-    
+
     helloworldContract.new({
         from : account,
         data : helloworld.code,
@@ -39,8 +41,13 @@ function main(){
                 var result = contract.add.call(3, 5);
                 console.log(result.toNumber());
                 console.log(contract.hi.call());
-                var r = contract.test_bytes.call("我");
-                console.log(r);
+                var result_utf8 = contract.test_bytes.call("我");
+                var hex_code = "0x";
+                for (var i=0; i<result_utf8.length; i++){
+                    hex_code += result_utf8.charCodeAt(i).toString(16);
+                }
+                var result_string = String.fromCharCode(parseInt(hex_code, 16));
+                console.log("Result: ", result_utf8, " Decode: ", result_string);
             }
         } else {
             console.error("JSON RPC Callback error.");

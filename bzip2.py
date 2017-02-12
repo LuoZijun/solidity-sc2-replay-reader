@@ -282,17 +282,12 @@ def parse_header(buf):
 def bits_to_number(bits):
     return int("".join(map(lambda n: str(n), bits )), 2)
 
-def parse_compressed_block(out, buf):
+def parse_compressed_block(out, buf, bits=[], pos=0):
     assert(isinstance(buf, BufferReader))
 
-    Huffman_Block_Magic       = (49,  65, 89, 38, 83,  89)  # 0x314159265359 BCD  (pi)
-    End_of_Stream_Block_Magic = (23, 114, 69, 56, 80, 144)  # 0x177245385090 sqrt (pi)
+    Huffman_Block_Magic       = 0x314159265359  # 0x314159265359 BCD  (pi)
+    End_of_Stream_Block_Magic = 0x177245385090  # 0x177245385090 sqrt (pi)
 
-    compressed_magic = buf.read_byte(length=6)
-    crc = buf.read_byte(length=4)
-
-    bits = []
-    pos  = 0
     def need_bits(num):
         end = pos + num
         if end > len(bits):
@@ -300,10 +295,19 @@ def parse_compressed_block(out, buf):
             bits.extend(_bits)
         return bits[pos:end]
 
+    compressed_magic = bits_to_number(need_bits(48))
+    pos += 48
+
+    crc = bits_to_number(need_bits(32))
+    pos += 32
+
+    print "\ncompressed_magic: ", hex(compressed_magic), " CRC: ", (crc)
     if compressed_magic == End_of_Stream_Block_Magic:
+        print "bzip2 end-of-stream block\n"
         return out
     elif compressed_magic == Huffman_Block_Magic:
         # 'bzip2 Huffman block'
+        print "bzip2 Huffman block\n"
         # 1 + 24 + 0..256 + 3 + 15 + 1..6 + 5 + 1..40
         # 0=>normal, 1=>randomised (deprecated)
         randomised = need_bits(1)[0]
@@ -391,7 +395,6 @@ def parse_compressed_block(out, buf):
                 lengths += [length]
             groups_lengths += [lengths]
             #print groups_lengths
-        
 
         tables = []
         for g in groups_lengths:
@@ -442,7 +445,7 @@ def parse_compressed_block(out, buf):
                         # snoopbits
                         # cached = field.snoopbits(x.bits)
                         cached = bits_to_number(need_bits(x.bits))
-                        print "Cached: ", cached
+                        # print "Cached: ", cached
                         # pos += x.bits
                         cached_length = x.bits
                     if (_reversed and x.reverse_symbol == cached) or (not _reversed and x.symbol == cached):
@@ -485,18 +488,16 @@ def parse_compressed_block(out, buf):
                 i += 1
         out += done
         print "Pos: ", pos, " Bits Length: ", len(bits)
-        print "Out: ", out
-        sys.exit(1)
+        return parse_compressed_block(out, buf, bits=bits, pos=pos)
     else:
-        raise "Illegal Bzip2 blocktype"
+        raise Exception("Illegal Bzip2 blocktype")
 
 
 def bzip2_main(buf):
     # https://en.wikipedia.org/wiki/Bzip2#File_format
     parse_header(buf)
 
-    out = parse_compressed_block('', buf)
-
+    return parse_compressed_block('', buf)
 
 def decompress(data):
     pass
@@ -507,7 +508,8 @@ def main():
     file = open(filename, "rb")
     buf = BufferReader(file, endian=">")
     out = bzip2_main(buf)
-    print("Data: %s" % out)
+    print "\n解压数据: "
+    print out
 
 if __name__ == '__main__':
     main()

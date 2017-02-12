@@ -5,6 +5,21 @@ from __future__ import division
 import sys, os, time, platform, math
 from struct import unpack, pack
 
+
+"""
+
+生成测试数据:
+
+    rm test.txt test.txt.bz2
+    echo 'hello, world(世界)!!!!' > test.txt
+    bzip2 -z test.txt
+
+解压数据:
+
+    python bzip2.py
+
+"""
+
 class BufferReader(object):
     def __init__(self, file, endian="<"):
         assert(hasattr(file, 'read'))
@@ -353,8 +368,9 @@ def parse_compressed_block(out, buf, bits=[], pos=0):
         print 'huffman groups', huffman_groups
 
         if not 2 <= huffman_groups <= 6:
-            raise "Bzip2: Number of Huffman groups not in range 2..6"
+            raise Exception("Bzip2: Number of Huffman groups not in range 2..6")
         selectors_used = bits_to_number(need_bits(15))
+        print 'selectors_used: ', selectors_used
         pos += 15
         mtf = range(huffman_groups)
         selectors_list = []
@@ -367,7 +383,9 @@ def parse_compressed_block(out, buf, bits=[], pos=0):
             while _tmp:
                 c += 1
                 if c >= huffman_groups:
-                    raise "Bzip2 chosen selector greater than number of groups (max 6)"
+                    raise Exception("Bzip2 chosen selector greater than number of groups (max 6)")
+                _tmp = bits_to_number(need_bits(1))
+                pos += 1
             if c >= 0:
                 move_to_front(mtf, c)
 
@@ -383,7 +401,7 @@ def parse_compressed_block(out, buf, bits=[], pos=0):
             lengths = []
             for i in range(symbols_in_use):
                 if not 0 <= length <= 20:
-                    raise "Bzip2 Huffman length code outside range 0..20"
+                    raise Exception("Bzip2 Huffman length code outside range 0..20")
                 _tmp = bits_to_number(need_bits(1))
                 pos += 1
                 while _tmp:
@@ -504,7 +522,7 @@ def decompress(data):
 
 
 def main():
-    filename = "test.bz2"
+    filename = "test.txt.bz2"
     file = open(filename, "rb")
     buf = BufferReader(file, endian=">")
     out = bzip2_main(buf)

@@ -18,6 +18,14 @@ from struct import unpack, pack
 
     python bzip2.py
 
+
+参考资料:
+    https://en.wikipedia.org/wiki/Bzip2
+
+注:
+    bzip2 并没有 RFC 文档，
+    所以你只有参考维基百科上面的 简洁介绍 以及 其它语言的现成代码来参考 。。。
+
 """
 
 class BufferReader(object):

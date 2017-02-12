@@ -78,7 +78,7 @@ class BufferReader(object):
     def read_usize(self, length=1):
         # unsigned long
         words = 4
-        if platform.machine() == 'x86_64':
+        if platform.architecture()[0] == '64bit':
             words = 8
         return unpack(self.endian + "%dL" % length, self.file.read(words*length))
     def read_u64(self, length=1):
@@ -97,7 +97,7 @@ class BufferReader(object):
     def read_isize(self, length=1):
         # long
         words = 4
-        if platform.machine() == 'x86_64':
+        if platform.architecture()[0] == '64bit':
             words = 8
         return unpack(self.endian + "%dl" % length, self.file.read(words*length))
     def read_i64(self, length=1):

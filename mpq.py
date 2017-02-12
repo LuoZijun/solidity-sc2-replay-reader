@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 
+import platform
 import os, struct, zlib, bz2
 from struct import unpack, pack
 from io import BytesIO
@@ -76,7 +77,10 @@ class BufferReader(object):
         return unpack(self.endian + "%dI" % length, self.file.read(4*length))
     def read_usize(self, length=1):
         # unsigned long
-        return unpack(self.endian + "%dL" % length, self.file.read(4*length))
+        words = 4
+        if platform.machine() == 'x86_64':
+            words = 8
+        return unpack(self.endian + "%dL" % length, self.file.read(words*length))
     def read_u64(self, length=1):
         # unsigned long long
         return unpack(self.endian + "%dQ" % length, self.file.read(8*length))
@@ -92,7 +96,10 @@ class BufferReader(object):
         return unpack(self.endian + "%di" % length, self.file.read(4*length))
     def read_isize(self, length=1):
         # long
-        return unpack(self.endian + "%dl" % length, self.file.read(4*length))
+        words = 4
+        if platform.machine() == 'x86_64':
+            words = 8
+        return unpack(self.endian + "%dl" % length, self.file.read(words*length))
     def read_i64(self, length=1):
         # long long
         return unpack(self.endian + "%dq" % length, self.file.read(8*length))
@@ -199,7 +206,7 @@ def test_buffer_reader():
     bits = map(lambda n: str(n), bits)
     print("".join(bits))
     print("Num: 458313805  Bin: ", bin(458313805).replace("0b", ""))
-    
+
     code = list("MPQ\x1b")
     _bytes = map(lambda s: ord(s), code)
     _result = map(lambda n: bin(n).replace("0b", ""), _bytes)

@@ -312,17 +312,20 @@ def parse_compressed_block(out, buf):
         assert(randomised == 0)
 
         # starting pointer into BWT for after untransform
-        orig_ptr = need_bits(24) # pointer
+        orig_ptr = bits_to_number(need_bits(24)) # pointer
         pos += 24
 
         # bitmap, of ranges of 16 bytes, present/not present
 
         huffman_used_map = bits_to_number(need_bits(16)) # 0x8800
         pos += 16
-        # if huffman_used_map:
+        
         #     reduce(lambda a,b: a*2, range(15), 1)
         map_mask = 1 << 15 # 32768
-        used = []  # huffman_used_bitmaps = 
+
+        # bitmap, of symbols used, present/not present (multiples of 16)
+        huffman_used_bitmaps = []# 0..256
+        used = []
 
         while map_mask > 0:
             if huffman_used_map & map_mask:
@@ -332,14 +335,14 @@ def parse_compressed_block(out, buf):
 
                 bit_mask = 1 << 15
                 while bit_mask > 0:
-                    if huffman_used_bitmap & bit_mask:
-                        pass
                     used += [bool(huffman_used_bitmap & bit_mask)]
                     bit_mask >>= 1
             else:
                 used += [False] * 16
             map_mask >>= 1
+
         # print used
+        # print len(used)
         huffman_groups = bits_to_number(need_bits(3))
         pos += 3
 
@@ -363,8 +366,9 @@ def parse_compressed_block(out, buf):
                     raise "Bzip2 chosen selector greater than number of groups (max 6)"
             if c >= 0:
                 move_to_front(mtf, c)
-            print c, mtf
+
             selectors_list += mtf[0:1]
+        print "selectors_list: ", selectors_list
 
         groups_lengths = []
         symbols_in_use = sum(used) + 2  # remember RUN[AB] RLE symbols
@@ -396,15 +400,24 @@ def parse_compressed_block(out, buf):
             codes.min_max_bits()
             tables.append(codes)
 
-        #favourites = map(chr,range(sum(used)))
-        #favourites = string.join([y for x,y in map(None,used,map(chr,range(len(used)))) if x],'')
-        favourites = [y for x,y in map(None,used,map(chr,range(len(used)))) if x]
+        # favourites = map(chr,range(sum(used)))
+        # favourites = string.join([y for x,y in map(None,used,map(chr,range(len(used)))) if x],'')
+        # favourites = [y for x,y in map(None,used,map(chr,range(len(used)))) if x]
+        __m1 = used
+        __m2 = map(chr, range(len(used)) )
 
+        # for x,y in map(None,used,  )
+        __m3 = filter( lambda (x,y): x == True, zip(__m1, __m2) )
+        __m4 = map(lambda (x, y): y, __m3)
+
+        favourites = __m4
+
+        print "favourites: ", favourites
         selector_pointer = 0
         decoded = 0
         # Main Huffman loop
         repeat = repeat_power = 0
-        buffer = ''
+        _buffer = ''
         t = None
         while True:
             decoded -= 1
@@ -413,31 +426,33 @@ def parse_compressed_block(out, buf):
                 if selector_pointer <= len(selectors_list):
                     t = tables[selectors_list[selector_pointer]]
                     selector_pointer += 1
-            print "Find Next Symbol: "
-
-            reversed = False
+                print 'tables changed', tables[0].table
+            # print "Find Next Symbol: "
+            _reversed = False
             # r = find_next_symbol(t, False)
+
             # find_next_symbol start
             cached_length = -1
             cached = None
             stop = False
             r = None
             for x in t.table:
-                if not stop:
+                if stop == False:
                     if cached_length != x.bits:
                         # snoopbits
                         # cached = field.snoopbits(x.bits)
                         cached = bits_to_number(need_bits(x.bits))
-                        pos += x.bits
+                        print "Cached: ", cached
+                        # pos += x.bits
                         cached_length = x.bits
-                    if (reversed and x.reverse_symbol == cached) or (not reversed and x.symbol == cached):
+                    if (_reversed and x.reverse_symbol == cached) or (not _reversed and x.symbol == cached):
                         # field.readbits(x.bits)
                         bits_to_number(need_bits(x.bits))
                         pos += x.bits
                         print "found symbol", hex(cached), "of len", cached_length, "mapping to", hex(x.code)
                         r = x.code
                         stop = True
-            if not stop:
+            if stop == False:
                 raise Exception("unfound symbol, even after end of table @%d " % pos)
             # find_next_symbol end
 
@@ -448,17 +463,17 @@ def parse_compressed_block(out, buf):
                 repeat_power <<= 1
                 continue
             elif repeat > 0:
-                buffer += favourites[0] * repeat
+                _buffer += favourites[0] * repeat
                 repeat = 0
             if r == symbols_in_use - 1:
                 break
             else:
                 o = favourites[r-1]
                 move_to_front(favourites, r-1)
-                buffer += o
+                _buffer += o
                 pass
 
-        nt = nearly_there = bwt_reverse(buffer, pointer)
+        nt = nearly_there = bwt_reverse(_buffer, orig_ptr)
         done = ''
         i = 0
         while i < len(nearly_there):
@@ -470,6 +485,7 @@ def parse_compressed_block(out, buf):
                 i += 1
         out += done
         print "Pos: ", pos, " Bits Length: ", len(bits)
+        print "Out: ", out
         sys.exit(1)
     else:
         raise "Illegal Bzip2 blocktype"
@@ -487,7 +503,7 @@ def decompress(data):
 
 
 def main():
-    filename = "pyflate/testdata/aaa.bz2"
+    filename = "test.bz2"
     file = open(filename, "rb")
     buf = BufferReader(file, endian=">")
     out = bzip2_main(buf)

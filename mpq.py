@@ -135,12 +135,14 @@ class BufferReader(object):
                 _bits.append(m)
             for n in range(8-len(_bits)):
                 _bits.append(0)
-            # _bits.reverse()
+            if self.endian == '>' or self.endian == '!':
+                _bits.reverse()
             bits.extend(_bits)
-        bits.reverse()
-        while bits[0] == 0:
-            bits = bits[1:]
-        return bits
+        if self.endian == '<':
+            bits.reverse()
+        # while bits[0] == 0:
+        #     bits = bits[1:]
+        return tuple(bits)
 
     def read_byte(self, length=1):
         return self.read_u8(length=length)

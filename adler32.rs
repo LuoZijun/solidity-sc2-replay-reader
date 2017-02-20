@@ -1,10 +1,10 @@
 
 // Copy from https://golang.org/src/hash/adler32/adler32.go
 
-// mod is the largest prime that is less than 65536.
-const MOD: usize  = 65521;
+// BASE is the largest prime that is less than 65536.
+const BASE: usize  = 65521;
 // nmax is the largest n such that
-// 255 * n * (n+1) / 2 + (n+1) * (mod-1) <= 2^32-1.
+// 255 * n * (n+1) / 2 + (n+1) * (BASE-1) <= 2^32-1.
 // It is mentioned in RFC 1950 (search for "5552").
 const NMAX: usize = 5552;
 
@@ -28,10 +28,7 @@ impl Adler32 {
         
         let mut p_s = 0;
         let mut p_e = p.len();
-
-        loop {
-
-        }
+        
         loop {
             let p_length = p.len();
             if p_length == 0 {
@@ -75,8 +72,8 @@ impl Adler32 {
                 s2 += s1;
             }
 
-            s1 %= MOD as u32;
-            s2 %= MOD as u32;
+            s1 %= BASE as u32;
+            s2 %= BASE as u32;
 
             p.clear();
             p.append(&mut q);
@@ -105,5 +102,5 @@ fn main() {
     println!("{} {:?}", s, bytes);
     let num = Adler32::check_sum(&mut bytes);
     
-    println!("String: {:?}\nBytes: {:?}\nNum: {:?} ({:#x})", s, bytes, num, num);
+    println!("String: {:?}\nBytes: {:?}\nNum: {:?}\tHex: {:#x}", s, bytes, num, num);
 }
